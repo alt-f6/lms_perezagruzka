@@ -1,34 +1,38 @@
-<%- include("../partials/shell", {
-  title,
-  user: locals.user,
-  body: `
-    <div class="space-y-4">
-      <h1 class="text-2xl font-semibold">${lesson.title}</h1>
+<%- include("../partials/shell-open", { title }) %>
 
-      <div class="text-slate-300 text-sm">
-        ${lesson.description ? lesson.description : "No description yet."}
-      </div>
+<div class="space-y-6">
+  <h1 class="text-2xl font-semibold"><%= lesson.title %></h1>
 
-      ${lesson.video_url ? `
-        <div class="aspect-video w-full overflow-hidden rounded-xl border border-slate-800">
-          <iframe
-            src="${lesson.video_url}"
-            class="h-full w-full"
-            frameborder="0"
-            allow="autoplay; fullscreen; picture-in-picture"
-            allowfullscreen
-          ></iframe>
-        </div>
-      ` : `
-        <div class="text-sm text-slate-400">No video yet.</div>
-      `}
+  <div class="text-slate-400 text-sm">
+    <%= lesson.description || "No description yet." %>
+  </div>
 
-      <a
-        href="/student/dashboard"
-        class="inline-block rounded-xl border border-slate-700 px-4 py-2 text-sm"
-      >
-        Back to dashboard
-      </a>
+  <% if (lesson.video_url) { %>
+    <div class="aspect-video w-full overflow-hidden rounded-xl border border-slate-800">
+      <iframe
+        src="<%= lesson.video_url %>"
+        class="h-full w-full"
+        frameborder="0"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+      ></iframe>
     </div>
-  `
-}) %>
+  <% } else { %>
+    <div class="text-sm text-slate-400">No video yet.</div>
+  <% } %>
+
+  <div
+    class="mt-6 whitespace-pre-wrap text-slate-200 leading-relaxed"
+  >
+    <%= lesson.content || "Lesson content not added yet." %>
+  </div>
+
+  <a
+    href="/student/dashboard"
+    class="inline-block rounded-xl border border-slate-700 px-4 py-2 text-sm"
+  >
+    Back to dashboard
+  </a>
+</div>
+
+<%- include("../partials/shell-close") %>
