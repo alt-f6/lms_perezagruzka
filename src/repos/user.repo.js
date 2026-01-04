@@ -1,4 +1,4 @@
-const db = require('../db');
+const db = require("../db");
 
 async function findByEmail(email) {
   const { rows } = await db.query(
@@ -20,7 +20,18 @@ async function findById(id) {
   return rows[0] || null;
 }
 
-async function createUser({ email, passwordHash, role = 'student', name = null }) {
+async function countAdmins() {
+  const { rows } = await db.query(
+    `select count(*)::int as count from users where role = 'admin'`
+  );
+  return rows[0].count;
+}
+
+async function deleteUserById(id) {
+  await db.query(`delete from users where id = $1`, [id]);
+}
+
+async function createUser({ email, passwordHash, role = "student", name = null }) {
   const { rows } = await db.query(
     `insert into users (email, password_hash, role, name)
      values ($1, $2, $3, $4)
@@ -33,5 +44,7 @@ async function createUser({ email, passwordHash, role = 'student', name = null }
 module.exports = {
   findByEmail,
   findById,
+  countAdmins,
+  deleteUserById, 
   createUser,
 };

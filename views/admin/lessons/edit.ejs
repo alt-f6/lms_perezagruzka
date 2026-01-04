@@ -1,0 +1,32 @@
+<%- include("../../partials/shell", {
+  title,
+  user: locals.user,
+  body: `
+    <h1 class="text-xl font-semibold mb-4">Edit lesson</h1>
+
+    <form method="POST" action="/admin/lessons/${lesson.id}" class="space-y-4">
+      <textarea
+        name="content"
+        rows="12"
+        class="w-full rounded-xl border border-slate-700 bg-slate-900/40 px-3 py-2"
+        placeholder="Lesson content..."
+      >${lesson.content || ""}</textarea>
+
+      <div class="flex gap-2">
+        <button
+          class="rounded-xl bg-slate-100 px-4 py-2 text-slate-900"
+          type="submit"
+        >
+          Save
+        </button>
+
+        <a
+          href="/admin/lessons"
+          class="rounded-xl border border-slate-700 px-4 py-2"
+        >
+          Cancel
+        </a>
+      </div>
+    </form>
+  `
+}) %>

@@ -17,6 +17,7 @@ async function getUsersPage(req, res, next) {
       total: result.total,
       totalPages,
       users: result.rows,
+      session: req.session,
     });
   } catch (err) {
     next(err);

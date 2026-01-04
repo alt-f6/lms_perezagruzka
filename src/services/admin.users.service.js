@@ -17,13 +17,10 @@ async function createStudent({ email, name, password, password2 }) {
   if (!normalizedEmail) errors.email = "Email is required";
   if (normalizedEmail && !normalizedEmail.includes("@")) errors.email = "Invalid email";
 
-  const p1 = String(password || "");
-  const p2 = String(password2 || "");
+  if (password.length < 8) errors.password = "Password must be at least 8 characters";
+  if (password !== password2) errors.password2 = "Passwords do not match";
 
-  if (p1.length < 8) errors.password = "Password must be at least 8 characters";
-  if (p1 !== p2) errors.password2 = "Passwords do not match";
-
-  if (Object.keys(errors).length > 0) {
+  if (Object.keys(errors).length) {
     const err = new Error("VALIDATION_ERROR");
     err.status = 400;
     err.errors = errors;
@@ -34,11 +31,10 @@ async function createStudent({ email, name, password, password2 }) {
   if (existing) {
     const err = new Error("EMAIL_ALREADY_EXISTS");
     err.status = 409;
-    err.errors = { email: "Email already exists" };
     throw err;
   }
 
-  const passwordHash = await bcrypt.hash(p1, BCRYPT_ROUNDS);
+  const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
   return adminUserRepo.createStudent({
     email: normalizedEmail,
@@ -47,6 +43,29 @@ async function createStudent({ email, name, password, password2 }) {
   });
 }
 
+async function deleteUser(targetUserId, actorUserId) {
+  if (String(targetUserId) === String(actorUserId)) {
+    const err = new Error("CANNOT_DELETE_SELF");
+    err.status = 400;
+    throw err;
+  }
+
+  const user = await userRepo.findById(targetUserId);
+  if (!user) return;
+
+  if (user.role === "admin") {
+    const adminsCount = await userRepo.countAdmins();
+    if (adminsCount <= 1) {
+      const err = new Error("CANNOT_DELETE_LAST_ADMIN");
+      err.status = 400;
+      throw err;
+    }
+  }
+
+  await userRepo.deleteUserById(targetUserId);
+}
+
 module.exports = {
   createStudent,
+  deleteUser,
 };

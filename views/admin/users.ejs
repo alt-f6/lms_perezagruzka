@@ -2,7 +2,10 @@
 
 <div class="flex items-start justify-between gap-4">
   <div>
-    <a href="/admin/users/new" class="rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-white">
+    <a
+      href="/admin/users/new"
+      class="rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-white"
+    >
       Create student
     </a>
 
@@ -17,7 +20,12 @@
   </a>
 </div>
 
-<form class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end" method="GET" action="/admin/users" data-loading="true">
+<form
+  class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end"
+  method="GET"
+  action="/admin/users"
+  data-loading="true"
+>
   <div class="flex-1">
     <label class="mb-1 block text-sm text-slate-300" for="q">Search by email</label>
     <input
@@ -59,12 +67,14 @@
         <th class="px-4 py-3">Role</th>
         <th class="px-4 py-3">Name</th>
         <th class="px-4 py-3">Created</th>
+        <th class="px-4 py-3 text-right">Actions</th>
       </tr>
     </thead>
+
     <tbody class="divide-y divide-slate-800">
       <% if (!users || users.length === 0) { %>
         <tr>
-          <td class="px-4 py-4 text-slate-400" colspan="4">No users found.</td>
+          <td class="px-4 py-4 text-slate-400" colspan="5">No users found.</td>
         </tr>
       <% } %>
 
@@ -76,6 +86,27 @@
           <td class="px-4 py-3 text-slate-400">
             <%= u.created_at ? new Date(u.created_at).toLocaleString() : "-" %>
           </td>
+
+          <td class="px-4 py-3">
+            <div class="flex justify-end">
+              <% if (!session || String(u.id) !== String(session.user_id)) { %>
+                <form
+                  method="POST"
+                  action="/admin/users/<%= u.id %>/delete"
+                  onsubmit="return confirm('Delete user permanently?')"
+                >
+                  <button
+                    type="submit"
+                    class="rounded-lg border border-red-700 px-3 py-1 text-sm text-red-400 hover:bg-red-950/40"
+                  >
+                    Delete
+                  </button>
+                </form>
+              <% } else { %>
+                <span class="text-xs text-slate-500">You</span>
+              <% } %>
+            </div>
+          </td>
         </tr>
       <% }) %>
     </tbody>
@@ -84,7 +115,8 @@
 
 <div class="mt-6 flex items-center justify-between text-sm">
   <div class="text-slate-400">
-    Page <span class="text-slate-200"><%= page %></span> of <span class="text-slate-200"><%= totalPages %></span>
+    Page <span class="text-slate-200"><%= page %></span> of
+    <span class="text-slate-200"><%= totalPages %></span>
   </div>
 
   <div class="flex gap-2">
