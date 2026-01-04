@@ -1,5 +1,14 @@
 const service = require("../services/admin.lessons.service");
 
+function extractEmbedUrl(input) {
+  if (!input) return null;
+
+  const iframeMatch = input.match(/src="([^"]+)"/i);
+  if (iframeMatch) return iframeMatch[1];
+
+  return input.trim();
+}
+
 async function getEditLesson(req, res, next) {
   try {
     const lesson = await service.getLessonForEdit(req.params.id);
@@ -18,8 +27,16 @@ async function getEditLesson(req, res, next) {
 
 async function postEditLesson(req, res, next) {
   try {
+    const { content, video_url } = req.body;
+
     await service.updateLesson(req.params.id, {
-      content: req.body.content,
+      content,
+    });
+
+    const videoUrl = extractEmbedUrl(video_url);
+
+    await service.updateLessonVideo(req.params.id, {
+      videoUrl,
     });
 
     return res.redirect("/admin/lessons");

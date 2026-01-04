@@ -10,6 +10,11 @@ async function getLessonForStudent(lessonId) {
   return lesson;
 }
 
+async function updateLessonVideo(id, { videoUrl }) {
+  await lessonsRepo.updateLessonVideoUrl(id, videoUrl);
+}
+
 module.exports = {
   getLessonForStudent,
+  updateLessonVideo,
 };

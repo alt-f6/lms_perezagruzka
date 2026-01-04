@@ -1,8 +1,20 @@
-<%- include("../partials/shell-open", { title }) %>
+<%- include("../../partials/shell-open", { title }) %>
 
 <h1 class="text-xl font-semibold mb-4">Edit lesson</h1>
 
 <form method="POST" action="/admin/lessons/<%= lesson.id %>" class="space-y-4">
+
+  <label class="block text-sm text-slate-300">
+    Video URL (YouTube / Vimeo / embed)
+  </label>
+  <input
+    type="text"
+    name="video_url"
+    class="w-full rounded-xl border border-slate-700 bg-slate-900/40 px-3 py-2"
+    placeholder="https://www.youtube.com/embed/VIDEO_ID"
+    value="<%= lesson.video_url || '' %>"
+  />
+
   <textarea
     name="content"
     rows="14"
@@ -27,4 +39,4 @@
   </div>
 </form>
 
-<%- include("../partials/shell-close") %>
+<%- include("../../partials/shell-close") %>

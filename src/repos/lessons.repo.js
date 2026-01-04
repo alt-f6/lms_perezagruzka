@@ -37,6 +37,17 @@ async function updateLessonContent(id, content) {
   );
 }
 
+async function updateLessonVideoUrl(id, videoUrl) {
+  await db.query(
+    `
+    UPDATE lessons
+    SET video_url = $2
+    WHERE id = $1
+    `,
+    [id, videoUrl || null]
+  );
+}
+
 async function deleteLessonById(id) {
   await db.query(
     `DELETE FROM lessons WHERE id = $1`,
@@ -48,5 +59,6 @@ module.exports = {
   getPublishedLessonById,
   getLessonById,
   updateLessonContent,
+  updateLessonVideoUrl,
   deleteLessonById,
 };
