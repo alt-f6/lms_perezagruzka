@@ -21,10 +21,8 @@
     <div class="text-sm text-slate-400">No video yet.</div>
   <% } %>
 
-  <div
-    class="mt-6 whitespace-pre-wrap text-slate-200 leading-relaxed"
-  >
-    <%= lesson.content || "Lesson content not added yet." %>
+  <div class="prose prose-invert max-w-none mt-6">
+    <%- lessonHtml || "<p>Lesson content not added yet.</p>" %>
   </div>
 
   <a

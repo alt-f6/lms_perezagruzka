@@ -1,4 +1,5 @@
 const lessonsService = require("../services/lessons.service");
+const { renderLessonContent } = require("../utils/renderLessonContent");
 
 async function viewLesson(req, res, next) {
   try {
@@ -7,6 +8,7 @@ async function viewLesson(req, res, next) {
     return res.render("lessons/view", {
       title: lesson.title,
       lesson,
+      lessonHtml: renderLessonContent(lesson.content),
     });
   } catch (err) {
     if (err && err.code === "LESSON_NOT_FOUND") {
