@@ -1,0 +1,34 @@
+<%- include("../partials/shell-open", { title: "Lessons" }) %>
+
+<div class="flex items-center justify-between">
+  <h1 class="text-2xl font-semibold">Lessons</h1>
+  <a href="/admin/lessons/new" class="rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-900">
+    Create lesson
+  </a>
+</div>
+
+<div class="mt-6 space-y-3">
+  <% if (!lessons.length) { %>
+    <p class="text-slate-400">No lessons yet.</p>
+  <% } %>
+
+  <% lessons.forEach(l => { %>
+    <div class="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 px-4 py-3">
+      <div>
+        <div class="font-medium"><%= l.title %></div>
+        <div class="text-sm text-slate-400">
+          order: <%= l.order %> · <%= l.is_published ? "published" : "draft" %>
+        </div>
+      </div>
+
+      <form method="POST" action="/admin/lessons/<%= l.id %>/publish">
+        <input type="hidden" name="is_published" value="<%= !l.is_published %>" />
+        <button class="rounded-lg border border-slate-700 px-3 py-1.5 text-sm">
+          <%= l.is_published ? "Unpublish" : "Publish" %>
+        </button>
+      </form>
+    </div>
+  <% }) %>
+</div>
+
+<%- include("../partials/shell-close") %>

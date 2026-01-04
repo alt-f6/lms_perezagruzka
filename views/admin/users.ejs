@@ -1,0 +1,110 @@
+<%- include("../partials/shell-open", { title: "Users" }) %>
+
+<div class="flex items-start justify-between gap-4">
+  <div>
+    <a href="/admin/users/new" class="rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-900 hover:bg-white">
+      Create student
+    </a>
+
+    <h1 class="text-2xl font-semibold">Users</h1>
+    <p class="mt-1 text-sm text-slate-400">
+      Total: <span class="text-slate-200"><%= total %></span>
+    </p>
+  </div>
+
+  <a href="/admin/dashboard" class="text-sm text-slate-300 hover:text-white">
+    Back to dashboard
+  </a>
+</div>
+
+<form class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end" method="GET" action="/admin/users" data-loading="true">
+  <div class="flex-1">
+    <label class="mb-1 block text-sm text-slate-300" for="q">Search by email</label>
+    <input
+      id="q"
+      name="q"
+      value="<%= q %>"
+      placeholder="student@example.com"
+      class="w-full rounded-xl border border-slate-700 bg-slate-900/40 px-3 py-2 outline-none focus:border-slate-400"
+    />
+  </div>
+
+  <div class="w-full sm:w-40">
+    <label class="mb-1 block text-sm text-slate-300" for="limit">Per page</label>
+    <input
+      id="limit"
+      name="limit"
+      type="number"
+      min="1"
+      max="100"
+      value="<%= limit %>"
+      class="w-full rounded-xl border border-slate-700 bg-slate-900/40 px-3 py-2 outline-none focus:border-slate-400"
+    />
+  </div>
+
+  <button
+    type="submit"
+    data-loading-text="Searching..."
+    class="rounded-xl bg-slate-100 px-4 py-2 font-medium text-slate-900 hover:bg-white active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
+  >
+    Search
+  </button>
+</form>
+
+<div class="mt-6 overflow-hidden rounded-2xl border border-slate-800">
+  <table class="w-full text-left text-sm">
+    <thead class="bg-slate-900/40 text-slate-300">
+      <tr>
+        <th class="px-4 py-3">Email</th>
+        <th class="px-4 py-3">Role</th>
+        <th class="px-4 py-3">Name</th>
+        <th class="px-4 py-3">Created</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-800">
+      <% if (!users || users.length === 0) { %>
+        <tr>
+          <td class="px-4 py-4 text-slate-400" colspan="4">No users found.</td>
+        </tr>
+      <% } %>
+
+      <% users.forEach((u) => { %>
+        <tr class="bg-slate-950/40">
+          <td class="px-4 py-3 font-medium text-slate-100"><%= u.email %></td>
+          <td class="px-4 py-3 text-slate-200"><%= u.role %></td>
+          <td class="px-4 py-3 text-slate-300"><%= u.name || "-" %></td>
+          <td class="px-4 py-3 text-slate-400">
+            <%= u.created_at ? new Date(u.created_at).toLocaleString() : "-" %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-6 flex items-center justify-between text-sm">
+  <div class="text-slate-400">
+    Page <span class="text-slate-200"><%= page %></span> of <span class="text-slate-200"><%= totalPages %></span>
+  </div>
+
+  <div class="flex gap-2">
+    <% const prevPage = Math.max(1, page - 1); %>
+    <% const nextPage = Math.min(totalPages, page + 1); %>
+
+    <a
+      class="rounded-lg border border-slate-700 px-3 py-1.5 text-slate-200 hover:bg-slate-900 <%= page <= 1 ? 'pointer-events-none opacity-40' : '' %>"
+      href="/admin/users?q=<%= encodeURIComponent(q) %>&limit=<%= limit %>&page=<%= prevPage %>"
+    >
+      Prev
+    </a>
+
+    <a
+      class="rounded-lg border border-slate-700 px-3 py-1.5 text-slate-200 hover:bg-slate-900 <%= page >= totalPages ? 'pointer-events-none opacity-40' : '' %>"
+      href="/admin/users?q=<%= encodeURIComponent(q) %>&limit=<%= limit %>&page=<%= nextPage %>"
+    >
+      Next
+    </a>
+  </div>
+</div>
+
+<%- include("../partials/shell-close") %>

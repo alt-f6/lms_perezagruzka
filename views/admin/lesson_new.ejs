@@ -1,0 +1,30 @@
+<%- include("../partials/shell-open", { title: "New lesson" }) %>
+
+<h1 class="text-2xl font-semibold">Create lesson</h1>
+
+<% if (error) { %>
+  <div class="mt-4 text-red-400"><%= error %></div>
+<% } %>
+
+<form method="POST" action="/admin/lessons" class="mt-6 max-w-md space-y-4">
+  <input name="title" placeholder="Title" required
+    class="w-full rounded-xl border border-slate-700 bg-slate-900/40 px-3 py-2"
+    value="<%= values.title %>" />
+
+  <textarea name="description" placeholder="Description"
+    class="w-full rounded-xl border border-slate-700 bg-slate-900/40 px-3 py-2"><%= values.description %></textarea>
+
+  <input name="video_url" placeholder="Video URL (optional)"
+    class="w-full rounded-xl border border-slate-700 bg-slate-900/40 px-3 py-2"
+    value="<%= values.video_url %>" />
+
+  <input type="number" name="order"
+    class="w-full rounded-xl border border-slate-700 bg-slate-900/40 px-3 py-2"
+    value="<%= values.order %>" />
+
+  <button class="rounded-xl bg-slate-100 px-4 py-2 font-medium text-slate-900">
+    Create
+  </button>
+</form>
+
+<%- include("../partials/shell-close") %>

@@ -1,0 +1,68 @@
+<%- include("../partials/shell-open", { title: "Create student" }) %>
+
+<div class="flex items-start justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold">Create student</h1>
+    <p class="mt-1 text-sm text-slate-400">Create a student account manually.</p>
+  </div>
+
+  <a href="/admin/users" class="text-sm text-slate-300 hover:text-white">Back to users</a>
+</div>
+
+<div class="mt-6 max-w-md">
+  <%- include("../partials/form-alert", { message: error }) %>
+
+  <form class="mt-4 space-y-4" method="POST" action="/admin/users" data-loading="true">
+    <%- include("../partials/form-field", {
+      id: "email",
+      label: "Email",
+      name: "email",
+      type: "email",
+      required: true,
+      autocomplete: "email",
+      placeholder: "student@example.com",
+      value: values.email,
+      error: errors.email
+    }) %>
+
+    <%- include("../partials/form-field", {
+      id: "name",
+      label: "Name (optional)",
+      name: "name",
+      type: "text",
+      required: false,
+      autocomplete: "name",
+      placeholder: "Student name",
+      value: values.name,
+      error: errors.name
+    }) %>
+
+    <%- include("../partials/form-field", {
+      id: "password",
+      label: "Password",
+      name: "password",
+      type: "password",
+      required: true,
+      autocomplete: "new-password",
+      placeholder: "At least 8 characters",
+      value: "",
+      error: errors.password
+    }) %>
+
+    <%- include("../partials/form-field", {
+      id: "password2",
+      label: "Confirm password",
+      name: "password2",
+      type: "password",
+      required: true,
+      autocomplete: "new-password",
+      placeholder: "Repeat password",
+      value: "",
+      error: errors.password2
+    }) %>
+
+    <%- include("../partials/form-submit", { text: "Create student", loadingText: "Creating..." }) %>
+  </form>
+</div>
+
+<%- include("../partials/shell-close") %>

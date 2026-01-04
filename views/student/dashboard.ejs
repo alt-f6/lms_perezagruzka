@@ -1,0 +1,53 @@
+<%- include("../partials/shell-open", { title: "Dashboard" }) %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-semibold">
+      Welcome, <%= locals.user?.name || locals.user?.email %>
+    </h1>
+    <p class="mt-1 text-sm text-slate-400">
+      This is your learning dashboard.
+    </p>
+  </div>
+
+  <div class="rounded-2xl border border-slate-800 bg-slate-950/40 p-4">
+    <h2 class="font-medium">Your status</h2>
+    <p class="mt-1 text-sm text-slate-400">
+      You are enrolled and ready to start.
+    </p>
+  </div>
+
+  <div>
+    <h2 class="mb-3 font-medium">Available lessons</h2>
+
+    <div class="space-y-3">
+      <% if (!lessons || lessons.length === 0) { %>
+        <div class="rounded-xl border border-slate-800 bg-slate-950/40 px-4 py-3 text-sm text-slate-400">
+          No lessons available yet.
+        </div>
+      <% } else { %>
+        <% lessons.forEach((lesson) => { %>
+          <div class="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 px-4 py-3">
+            <div>
+              <div class="font-medium">
+                <%= lesson.title %>
+              </div>
+              <div class="text-sm text-slate-400">
+                <%= lesson.description || "" %>
+              </div>
+            </div>
+
+            <a
+              href="/lessons/<%= lesson.id %>"
+              class="rounded-lg bg-slate-100 px-3 py-1 text-sm text-slate-900"
+            >
+              Open
+            </a>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include("../partials/shell-close") %>

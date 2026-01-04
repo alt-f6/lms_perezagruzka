@@ -1,0 +1,9 @@
+body { font-family: Arial, sans-serif; margin: 0; }
+.container { max-width: 900px; margin: 0 auto; padding: 16px; }
+.topbar { border-bottom: 1px solid #ddd; }
+.brand { font-weight: 700; }
+label { display: block; margin-top: 12px; }
+input { width: 320px; padding: 8px; margin-top: 6px; }
+button { margin-top: 12px; padding: 8px 12px; cursor: pointer; }
+.alert { background: #ffe1e1; padding: 10px; margin: 10px 0; }
+.hint { color: #666; }
