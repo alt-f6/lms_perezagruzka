@@ -25,6 +25,7 @@
     "db-check": "tsx scripts/db-check.ts",
     "db:seed": "tsx scripts/db-seed.ts",
     "postinstall": "prisma generate",
-    "migrate:deploy": "prisma migrate deploy"
+    "migrate:deploy": "prisma migrate deploy",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   }
 }
