@@ -1,0 +1,145 @@
+CREATE SCHEMA IF NOT EXISTS "public";
+
+CREATE TABLE "public"."assignments" (
+  "id" BIGSERIAL NOT NULL,
+  "student_id" BIGINT NOT NULL,
+  "lesson_id" BIGINT NOT NULL,
+  "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "assignments_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "public"."lesson_assets" (
+  "id" BIGSERIAL NOT NULL,
+  "lesson_id" BIGINT NOT NULL,
+  "kind" TEXT NOT NULL,
+  "title" TEXT,
+  "original_name" TEXT NOT NULL,
+  "mime_type" TEXT NOT NULL,
+  "size_bytes" BIGINT NOT NULL DEFAULT 0,
+  "storage_key" TEXT NOT NULL,
+  "order" INTEGER NOT NULL DEFAULT 1,
+  "is_public" BOOLEAN NOT NULL DEFAULT true,
+  "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "lesson_assets_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "public"."lesson_media" (
+  "id" BIGSERIAL NOT NULL,
+  "lesson_id" BIGINT NOT NULL,
+  "kind" TEXT NOT NULL DEFAULT 'video',
+  "title" TEXT,
+  "url" TEXT NOT NULL,
+  "provider" TEXT NOT NULL,
+  "embed_url" TEXT NOT NULL,
+  "order" INTEGER NOT NULL DEFAULT 1,
+  "is_public" BOOLEAN NOT NULL DEFAULT true,
+  "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "lesson_media_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "public"."lessons" (
+  "id" BIGSERIAL NOT NULL,
+  "title" TEXT NOT NULL,
+  "description" TEXT NOT NULL DEFAULT '',
+  "content" TEXT NOT NULL DEFAULT '',
+  "is_published" BOOLEAN NOT NULL DEFAULT false,
+  "order" INTEGER NOT NULL DEFAULT 0,
+  "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "video_url" TEXT,
+  "video_provider" TEXT,
+  "video_embed_url" TEXT,
+  "video_duration_sec" INTEGER,
+  "video_poster_url" TEXT,
+  CONSTRAINT "lessons_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "public"."schema_patches" (
+  "id" BIGSERIAL NOT NULL,
+  "patch_name" TEXT NOT NULL,
+  "applied_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "schema_patches_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "public"."sessions" (
+  "id" BIGSERIAL NOT NULL,
+  "token" TEXT NOT NULL,
+  "user_id" BIGINT NOT NULL,
+  "expires_at" TIMESTAMPTZ(6) NOT NULL,
+  "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "sessions_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "public"."users" (
+  "id" BIGSERIAL NOT NULL,
+  "email" TEXT NOT NULL,
+  "password_hash" TEXT NOT NULL,
+  "role" TEXT NOT NULL,
+  "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "first_name" TEXT NOT NULL DEFAULT '',
+  "last_name" TEXT NOT NULL DEFAULT '',
+  CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "assignments_student_id_lesson_id_key"
+  ON "public"."assignments" ("student_id", "lesson_id");
+
+CREATE UNIQUE INDEX "assignments_student_lesson_unique"
+  ON "public"."assignments" ("student_id", "lesson_id");
+
+CREATE INDEX "idx_assignments_student_id"
+  ON "public"."assignments" ("student_id");
+
+CREATE INDEX "idx_lesson_assets_lesson_id"
+  ON "public"."lesson_assets" ("lesson_id");
+
+CREATE INDEX "idx_lesson_assets_lesson_id_order"
+  ON "public"."lesson_assets" ("lesson_id", "order");
+
+CREATE UNIQUE INDEX "lesson_assets_lesson_id_order_key"
+  ON "public"."lesson_assets" ("lesson_id", "order");
+
+CREATE INDEX "idx_lesson_media_lesson_id"
+  ON "public"."lesson_media" ("lesson_id");
+
+CREATE UNIQUE INDEX "lesson_media_lesson_id_order_key"
+  ON "public"."lesson_media" ("lesson_id", "order");
+
+CREATE INDEX "idx_lessons_pub_order"
+  ON "public"."lessons" ("is_published", "order");
+
+CREATE UNIQUE INDEX "schema_patches_patch_name_key"
+  ON "public"."schema_patches" ("patch_name");
+
+CREATE INDEX "idx_sessions_expires_at"
+  ON "public"."sessions" ("expires_at");
+
+CREATE UNIQUE INDEX "sessions_token_key"
+  ON "public"."sessions" ("token");
+
+CREATE UNIQUE INDEX "users_email_key"
+  ON "public"."users" ("email");
+
+ALTER TABLE "public"."assignments"
+  ADD CONSTRAINT "assignments_lesson_id_fkey"
+  FOREIGN KEY ("lesson_id") REFERENCES "public"."lessons" ("id")
+  ON DELETE CASCADE;
+
+ALTER TABLE "public"."assignments"
+  ADD CONSTRAINT "assignments_student_id_fkey"
+  FOREIGN KEY ("student_id") REFERENCES "public"."users" ("id")
+  ON DELETE CASCADE;
+
+ALTER TABLE "public"."lesson_assets"
+  ADD CONSTRAINT "lesson_assets_lesson_id_fkey"
+  FOREIGN KEY ("lesson_id") REFERENCES "public"."lessons" ("id")
+  ON DELETE CASCADE;
+
+ALTER TABLE "public"."lesson_media"
+  ADD CONSTRAINT "lesson_media_lesson_id_fkey"
+  FOREIGN KEY ("lesson_id") REFERENCES "public"."lessons" ("id")
+  ON DELETE CASCADE;
+
+ALTER TABLE "public"."sessions"
+  ADD CONSTRAINT "sessions_user_id_fkey"
+  FOREIGN KEY ("user_id") REFERENCES "public"."users" ("id")
+  ON DELETE CASCADE;

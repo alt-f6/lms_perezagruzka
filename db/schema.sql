@@ -1,3 +1,5 @@
+SET client_encoding TO 'UTF8';
+
 CREATE TABLE IF NOT EXISTS users (
   id BIGSERIAL PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,

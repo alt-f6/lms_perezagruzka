@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  admin
+  student
+}
+
+enum MediaKind {
+  photo
+  pdf
+  video
+}
+
+model assignments {
+  id         BigInt   @id @default(autoincrement())
+  student_id BigInt
+  lesson_id  BigInt
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  lessons    lessons  @relation(fields: [lesson_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users      users    @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([student_id, lesson_id], map: "assignments_student_lesson_unique")
+  @@index([student_id], map: "idx_assignments_student_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model lesson_assets {
+  id            BigInt   @id @default(autoincrement())
+  lesson_id     BigInt
+  kind          MediaKind
+  title         String?
+  original_name String
+  mime_type     String
+  size_bytes    BigInt   @default(0)
+  storage_key   String
+  order         Int      @default(1)
+  is_public     Boolean  @default(true)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  lessons       lessons  @relation(fields: [lesson_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([lesson_id, order])
+  @@index([lesson_id], map: "idx_lesson_assets_lesson_id")
+  @@index([lesson_id, order], map: "idx_lesson_assets_lesson_id_order")
+}
+
+model lesson_media {
+  id         BigInt   @id @default(autoincrement())
+  lesson_id  BigInt
+  kind       MediaKind @default(video)
+  title      String?
+  url        String
+  provider   String
+  embed_url  String
+  order      Int      @default(1)
+  is_public  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  lessons    lessons  @relation(fields: [lesson_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([lesson_id, order])
+  @@index([lesson_id], map: "idx_lesson_media_lesson_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model lessons {
+  id                 BigInt          @id @default(autoincrement())
+  title              String
+  description        String          @default("")
+  content            String          @default("")
+  is_published       Boolean         @default(false)
+  order              Int             @default(0)
+  created_at         DateTime        @default(now()) @db.Timestamptz(6)
+  video_url          String?
+  video_provider     String?
+  video_embed_url    String?
+  video_duration_sec Int?
+  video_poster_url   String?
+  assignments        assignments[]
+  lesson_assets      lesson_assets[]
+  lesson_media       lesson_media[]
+
+  @@index([is_published, order], map: "idx_lessons_pub_order")
+}
+
+model schema_patches {
+  id         BigInt   @id @default(autoincrement())
+  patch_name String   @unique
+  applied_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model sessions {
+  id         BigInt   @id @default(autoincrement())
+  token      String   @unique
+  user_id    BigInt
+  expires_at DateTime @db.Timestamptz(6)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([expires_at], map: "idx_sessions_expires_at")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model users {
+  id            BigInt        @id @default(autoincrement())
+  email         String        @unique
+  password_hash String
+  role          UserRole
+  created_at    DateTime      @default(now()) @db.Timestamptz(6)
+  first_name    String        @default("")
+  last_name     String        @default("")
+  assignments   assignments[]
+  sessions      sessions[]
+}

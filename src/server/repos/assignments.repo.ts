@@ -45,3 +45,38 @@ export async function revokeLesson(studentId: number, lessonId: number) {
     [studentId, lessonId]
   );
 }
+
+export async function setAssignmentsForStudent(studentId: number, lessonIds: number[]) {
+  await pool.query("BEGIN");
+  try {
+    await pool.query(`DELETE FROM assignments WHERE student_id = $1`, [studentId]);
+
+    const ids = Array.from(new Set(lessonIds))
+      .map((x) => Number(x))
+      .filter((x) => Number.isFinite(x) && x > 0);
+
+    if (ids.length > 0) {
+      const values: any[] = [];
+      const placeholders = ids
+        .map((lessonId, i) => {
+          values.push(studentId, lessonId);
+          const p1 = i * 2 + 1;
+          const p2 = i * 2 + 2;
+          return `($${p1}, $${p2})`;
+        })
+        .join(", ");
+
+      await pool.query(
+        `INSERT INTO assignments (student_id, lesson_id)
+         VALUES ${placeholders}
+         ON CONFLICT (student_id, lesson_id) DO NOTHING`,
+        values
+      );
+    }
+
+    await pool.query("COMMIT");
+  } catch (e) {
+    await pool.query("ROLLBACK");
+    throw e;
+  }
+}

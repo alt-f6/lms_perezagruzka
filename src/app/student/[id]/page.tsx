@@ -1,12 +1,12 @@
 import { pool } from "@/src/server/db/pool";
-import { requireRole } from "@/src/server/auth/require-role";
+import { requireRolePage } from "@/src/server/auth/require-role-page";
 
 export default async function StudentLessonPage({
   params,
 }: {
   params: { id: string };
 }) {
-  const user = await requireRole("student");
+  const user = await requireRolePage("student");
   const lessonId = Number(params.id);
 
   if (!Number.isFinite(lessonId)) {

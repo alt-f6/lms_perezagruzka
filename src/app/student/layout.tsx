@@ -1,13 +1,19 @@
-import type { ReactNode } from "react";
-import { requireRole } from "@/src/server/auth/require-role";
-import StudentShell from "@/src/components/StudentShell";
+import React from "react";
+import { requireRolePage } from "@/src/server/auth/require-role-page";
+import { TopNav } from "@/src/components/TopNav";
 
-export default async function StudentLayout({ children }: { children: ReactNode }) {
-  await requireRole("student");
+export default async function StudentLayout({ children }: { children: React.ReactNode }) {
+  await requireRolePage("student");
 
   return (
-    <StudentShell>
-      {children}
-    </StudentShell>
+    <div style={{ minHeight: "100vh" }}>
+      <TopNav
+        title="Student"
+        items={[
+          { href: "/student/lessons", label: "Уроки" },
+        ]}
+      />
+      <main style={{ padding: 20 }}>{children}</main>
+    </div>
   );
 }

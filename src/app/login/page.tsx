@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,49 +43,51 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ padding: 24, maxWidth: 420 }}>
-      <h1>Login</h1>
+    <div className="container">
+      <div className="card">
+        <div className="badge">Перезагрузка</div>
 
-      <form onSubmit={onSubmit} style={{ display: "grid", gap: 12 }}>
-        <label style={{ display: "grid", gap: 6 }}>
-          <span>Email</span>
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ padding: 10, border: "1px solid #ccc", borderRadius: 8 }}
-            autoComplete="email"
-          />
-        </label>
+        <div className="h1">Вход</div>
+        <div className="h2">Введите почту и пароль</div>
 
-        <label style={{ display: "grid", gap: 6 }}>
-          <span>Password</span>
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            style={{ padding: 10, border: "1px solid #ccc", borderRadius: 8 }}
-            autoComplete="current-password"
-          />
-        </label>
+        <div className="space" />
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: 10,
-            borderRadius: 8,
-            border: "1px solid #000",
-            cursor: "pointer",
-          }}
-        >
-          {loading ? "Logging in..." : "Login"}
-        </button>
+        <form onSubmit={onSubmit} className="form">
+          <label>
+            <span className="label">Email</span>
+            <input
+              className="input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              inputMode="email"
+            />
+          </label>
 
-        {error ? <p style={{ color: "red" }}>{error}</p> : null}
-        <p style={{ opacity: 0.8, fontSize: 14 }}>
-          Test: admin@lms.local / admin12345 или student@lms.local / student12345
-        </p>
-      </form>
-    </main>
+          <label>
+            <span className="label">Password</span>
+            <input
+              className="input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              autoComplete="current-password"
+            />
+          </label>
+
+          <button className="btn primary" type="submit" disabled={loading}>
+            {loading ? "Входим..." : "Войти"}
+          </button>
+
+          {error ? <div className="error">{error}</div> : null}
+
+          <div style={{ marginTop: 10 }}>
+            <Link href="/" className="linkMuted">
+              На главную
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }

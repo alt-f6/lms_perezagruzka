@@ -1,5 +1,6 @@
-import crypto from "crypto";
+import crypto, { timingSafeEqual } from "crypto";
 import { pool } from "@/src/server/db/pool";
+import { cookies } from "next/headers";
 
 const COOKIE_NAME = process.env.COOKIE_NAME || "lms_session";
 const COOKIE_SECRET = process.env.COOKIE_SECRET || "";
@@ -25,9 +26,19 @@ export function verify(signed: string) {
   mustSecret();
   const parts = signed.split(".");
   if (parts.length !== 2) return null;
+
   const [token, sig] = parts;
-  const expected = crypto.createHmac("sha256", COOKIE_SECRET).update(token).digest("hex");
-  if (sig !== expected) return null;
+  const expected = crypto
+    .createHmac("sha256", COOKIE_SECRET)
+    .update(token)
+    .digest("hex");
+
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+
+  if (a.length !== b.length) return null;
+  if (!timingSafeEqual(a, b)) return null;
+
   return token;
 }
 
@@ -35,13 +46,33 @@ export async function createSession(userId: number) {
   const token = crypto.randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + TTL_HOURS * 60 * 60 * 1000);
 
+  await pool.query("DELETE FROM sessions WHERE expires_at <= now()");
+
   await pool.query(
     "INSERT INTO sessions (token, user_id, expires_at) VALUES ($1,$2,$3)",
     [token, userId, expiresAt]
   );
 
+  await pool.query(
+    `
+    DELETE FROM sessions
+    WHERE user_id = $1
+      AND id NOT IN (
+        SELECT id
+        FROM sessions
+        WHERE user_id = $1
+        ORDER BY created_at DESC, id DESC
+        LIMIT 5
+      )
+    `,
+    [userId]
+  );
+
+
   return { token, expiresAt };
 }
+
+
 
 export async function getUserBySession(token: string) {
   const r = await pool.query(
@@ -57,4 +88,21 @@ export async function getUserBySession(token: string) {
 
 export async function deleteSession(token: string) {
   await pool.query("DELETE FROM sessions WHERE token=$1", [token]);
+}
+
+export async function getSessionUser() {
+  const jar = await cookies();
+  const raw = jar.get(cookieName())?.value;
+  if (!raw) return null;
+
+  const token = verify(raw);
+  if (!token) return null;
+
+  const user = await getUserBySession(token);
+  if (!user) {
+    await deleteSession(token);
+    return null;
+  }
+
+  return { ...user, token };
 }

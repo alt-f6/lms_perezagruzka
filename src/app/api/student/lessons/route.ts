@@ -1,9 +1,9 @@
 import { NextResponse  } from "next/server";
-import { requireRole } from "@/src/server/auth/require-role";
+import { requireRoleApi} from "@/src/server/auth/require-role-api";
 import { pool } from "@/src/server/db/pool";
 
 export async function GET() {
-  const user = await requireRole("student");
+  const user = await requireRoleApi("student");
 
   const r = await pool.query(
     `

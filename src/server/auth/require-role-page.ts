@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cookieName, verify, getUserBySession } from "@/src/server/auth/session";
 
-export async function requireRole(role: "admin" | "student") {
+export async function requireRolePage(role: "admin" | "student") {
   const jar = await cookies();
   const raw = jar.get(cookieName())?.value;
   if (!raw) redirect("/login");
